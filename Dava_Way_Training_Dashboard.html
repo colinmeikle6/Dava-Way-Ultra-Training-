@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#17365d">
+<title>Dava Way Ultra Training</title>
+<style>
+:root{--navy:#17365d;--blue:#d9eaf7;--bg:#f4f7fb;--ink:#172333;--muted:#637286;--green:#e2f0d9}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:16px system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink)}
+header{background:var(--navy);color:white;padding:22px 18px 20px}header h1{font-size:22px;margin:0 0 5px}header p{margin:0;color:#dce8f5;font-size:13px}
+main{max-width:760px;margin:auto;padding:14px;display:grid;gap:12px}
+.card{background:white;border-radius:16px;padding:16px;box-shadow:0 2px 12px #1a355012}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.metric{background:#f1f5fa;border-radius:12px;padding:10px}.metric b{display:block;font-size:20px;color:var(--navy)}.metric span{font-size:11px;color:var(--muted)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}h2{font-size:17px;margin:0 0 12px}.muted{color:var(--muted);font-size:13px}
+select,button{font:inherit;border-radius:10px;border:1px solid #cbd5e1;padding:10px;background:white;color:var(--ink)}
+button{background:var(--navy);color:white;border:0;font-weight:600;cursor:pointer}.session{padding:11px 0;border-top:1px solid #e7edf4}.session:first-of-type{border-top:0}.session b{display:block}.tag{display:inline-block;background:var(--blue);color:var(--navy);border-radius:20px;padding:3px 8px;font-size:11px;font-weight:700}
+.note{font-size:13px;line-height:1.5;color:#435166}.bar{height:9px;background:#e7edf4;border-radius:20px;overflow:hidden}.bar>i{display:block;height:100%;background:#26845f;width:0}
+input[type=number]{width:86px;padding:8px;border:1px solid #cbd5e1;border-radius:8px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:8px 20px 25px}
+@media(min-width:600px){main{grid-template-columns:1fr 1fr}.wide{grid-column:1/-1}}
+</style></head><body>
+<header><h1>Dava Way Ultra</h1><p>Sub-5-hour project · 5 runs per week · 40-week plan</p></header>
+<main>
+<section class="card wide"><div class="metrics">
+<div class="metric"><b>49</b><span>VO₂ max</span></div><div class="metric"><b>46:18</b><span>10K PB</span></div><div class="metric"><b>83 kg</b><span>Current weight</span></div>
+</div><p class="muted">5K PB 22:09 · 35–45 km/week · 5 running days</p></section>
+<section class="card wide">
+<div class="row"><h2>Choose your training week</h2><select id="week"></select></div>
+<div id="weekInfo"></div>
+</section>
+<section class="card"><h2>Training priorities</h2>
+<p class="note">Keep one quality session each week to retain speed, build easy aerobic volume, and progressively extend the weekend long run. Easy runs should feel conversational.</p>
+<p><span class="tag">Speed</span> Threshold, controlled 10K effort, hills and strides.</p>
+<p><span class="tag">Endurance</span> Gradual long-run progression and later back-to-back weekends.</p>
+<p><span class="tag">Recovery</span> Every fourth week is generally lighter.</p></section>
+<section class="card"><h2>Weekly mileage tracker</h2>
+<div class="row"><label for="actual">Actual km this week</label><input id="actual" type="number" min="0" max="150" step=".1" placeholder="0"></div>
+<p class="muted" id="targetText">Select a week to see target mileage.</p><div class="bar"><i id="progress"></i></div>
+<p class="muted">Saved on this device in this browser.</p></section>
+<section class="card wide"><h2>Important reminders</h2><p class="note">• Fuel long runs over 90 minutes; gradually practise 60–90 g carbohydrate/hour if tolerated.<br>• Do not force mileage through pain or poor recovery. Repeat or reduce a week when needed.<br>• Week 40 should align with the confirmed 2027 race date. The organiser's date needs checking.<br>• Sub-5 requires about 6:00/km for 50 km or 5:53/km for 51 km, before accounting for course conditions.</p></section>
+</main><footer>Personal training reference · Not a live coaching or medical service</footer>
+<script>
+const plan = [
+[1,35,12,"Easy + 6 × 20 sec strides","Easy","Easy + strides","12 km easy","5 km recovery","Build routine"],
+[2,38,14,"Easy + 6 × 20 sec strides","Easy","Easy","14 km easy","5 km recovery","Fuel if over 90 min"],
+[3,40,15,"6 × 45 sec controlled hills","Easy","Easy + 4 strides","15 km easy","6 km recovery","Keep hills controlled"],
+[4,34,12,"Easy + 4 strides","Easy","Easy","12 km easy","5 km recovery","Recovery week"],
+[5,40,16,"3 × 5 min comfortably hard","Easy","Easy + strides","16 km easy","6 km recovery","Practise drinking and fuelling"],
+[6,42,17,"3 × 5 min comfortably hard","Easy","Easy","17 km easy","6 km recovery","Do not force pace"],
+[7,44,18,"6 × 2 min controlled hills","Easy","Easy + strides","18 km easy","6 km recovery","Finish controlled"],
+[8,36,14,"Easy + 4 strides","Easy","Easy","14 km easy","5 km recovery","Recovery week"],
+[9,42,18,"5 × 3 min threshold","Easy","Easy + strides","18 km easy","6 km recovery","Structured threshold"],
+[10,44,20,"4 × 5 min threshold","Easy","Easy","20 km easy","6 km recovery","Trail time"],
+[11,46,21,"6 × 3 min threshold","Easy","Easy + strides","21 km easy","7 km recovery","Race kit practice"],
+[12,38,16,"Easy + 6 strides","Easy","Easy","16 km easy","6 km recovery","Recovery week"],
+[13,45,22,"3 × 8 min threshold","Easy","Easy + strides","22 km easy","7 km recovery","Conversational long run"],
+[14,47,23,"5 × 1 km controlled 10K effort","Easy","Easy","23 km easy","7 km recovery","Benchmark only if fresh"],
+[15,49,24,"20 min tempo","Easy","Easy + strides","24 km easy","7 km recovery","Practise 60 g carbs/hour"],
+[16,40,18,"Easy + strides","Easy","Easy","18 km easy","6 km recovery","Recovery week"],
+[17,48,24,"4 × 6 min threshold","Easy","Easy + strides","24 km easy","8 km easy","Rolling trails"],
+[18,50,25,"5 × 1 km controlled","Easy","Easy","25 km easy","8 km recovery","Fuel consistently"],
+[19,52,26,"25 min tempo","Easy","Easy + strides","26 km easy","8 km easy","Gentle back-to-back"],
+[20,42,20,"Easy + strides","Easy","Easy","20 km easy","6 km recovery","Recovery week"],
+[21,50,26,"3 × 10 min threshold","Easy","Easy + strides","26 km easy","8 km easy","Trail surfaces"],
+[22,52,27,"6 × 3 min uphill","Easy","Easy","27 km easy","8 km recovery","Controlled descents"],
+[23,54,28,"2 × 15 min tempo","Easy","Easy + strides","28 km easy","8 km easy","Fuel 60–75 g/hour if tolerated"],
+[24,44,22,"Easy + strides","Easy","Easy","22 km easy","6 km recovery","Recovery week"],
+[25,54,28,"5 × 1 km controlled","Easy","Easy + strides","28 km easy","9 km easy","Ultra-effort blocks"],
+[26,56,30,"3 × 12 min threshold","Easy","Easy","30 km easy","9 km recovery","Trail endurance"],
+[27,58,30,"6 × 4 min uphill","Easy","Easy + strides","30 km easy","10 km easy","Back-to-back weekend"],
+[28,46,22,"Easy + strides","Easy","Easy","22 km easy","7 km recovery","Recovery week"],
+[29,58,30,"3 × 15 min steady/threshold","Easy","Easy + strides","30 km with 3 × 10 min steady","10 km easy","Full fuelling practice"],
+[30,60,32,"5 × 1 km controlled","Easy","Easy","32 km easy","10 km recovery","Only if recovering well"],
+[31,62,30,"25 min tempo","Easy","Easy + strides","30 km trail","12 km easy","Peak back-to-back"],
+[32,48,22,"Easy + strides","Easy","Easy","22 km easy","8 km recovery","Recovery week"],
+[33,60,32,"4 × 8 min threshold","Easy","Easy + strides","32 km easy/trail","10 km recovery","Last major long run"],
+[34,56,28,"3 × 10 min threshold","Easy","Easy","28 km; final 20 min steady","10 km easy","Maintain speed"],
+[35,50,24,"6 × 3 min at 10K effort","Easy","Easy + strides","24 km easy","8 km recovery","Reduce fatigue"],
+[36,42,20,"20 min tempo","Easy","Easy","20 km easy","7 km recovery","Taper begins"],
+[37,35,16,"5 × 3 min controlled","Easy","Easy + strides","16 km easy","6 km recovery","Keep fresh"],
+[38,28,12,"6 × 1 min brisk","Easy","Easy","12 km easy","5 km recovery","Reduce volume"],
+[39,20,8,"4 × 2 min relaxed brisk","Easy","Easy","8 km easy","4 km easy","Race preparation"],
+[40,0,0,"Race week: short easy runs then race","Easy","Easy","DAVA WAY 50–51 km","Rest","Align with confirmed race date"]
+];
+const select=document.getElementById('week');
+plan.forEach(p=>{let o=document.createElement('option');o.value=p[0];o.textContent='Week '+p[0];select.appendChild(o)});
+const actual=document.getElementById('actual');
+function render(){
+ const p=plan[Number(select.value)-1];
+ document.getElementById('weekInfo').innerHTML=`<p><span class="tag">Target ${p[1]} km</span> <span class="tag">Long run ${p[2]} km</span></p>
+ <div class="session"><b>Tuesday · Quality</b>${p[3]}</div>
+ <div class="session"><b>Wednesday · Easy</b>${p[4]}</div>
+ <div class="session"><b>Friday · Easy / strides</b>${p[5]}</div>
+ <div class="session"><b>Saturday · Long run</b>${p[6]}</div>
+ <div class="session"><b>Sunday · Recovery</b>${p[7]}</div>
+ <p class="note">${p[8]}</p>`;
+ const saved=localStorage.getItem('dava-actual-'+p[0])||'';
+ actual.value=saved;
+ document.getElementById('targetText').textContent=`Week ${p[0]} target: ${p[1]} km`;
+ updateBar();
+}
+function updateBar(){
+ const p=plan[Number(select.value)-1], v=Number(actual.value)||0;
+ const pct=p[1]>0?Math.min(100,v/p[1]*100):0;
+ document.getElementById('progress').style.width=pct+'%';
+}
+select.addEventListener('change',render);
+actual.addEventListener('input',()=>{localStorage.setItem('dava-actual-'+select.value,actual.value);updateBar()});
+select.value='1';render();
+</script></body></html>
